@@ -10,13 +10,13 @@ importers:
     dependencies:
       '@hono/node-server':
         specifier: ^1.14.3
-        version: 1.19.9(hono@4.11.1)
+        version: 1.19.9(hono@4.11.7)
       '@hono/zod-validator':
         specifier: ^0.5.0
-        version: 0.5.0(hono@4.11.1)(zod@3.25.76)
+        version: 0.5.0(hono@4.11.7)(zod@3.25.76)
       hono:
         specifier: ^4.8.2
-        version: 4.11.1
+        version: 4.11.7
       zod:
         specifier: ^3.25.67
         version: 3.25.76
@@ -211,8 +211,8 @@ packages:
   get-tsconfig@4.13.0:
     resolution: {integrity: sha512-1VKTZJCwBrvbd+Wn3AOgQP/2Av+TfTCOlE4AcRJE72W1ksZXbAx8PPBR9RzgTeSPzlPMHrbANMH3LbltH73wxQ==}
 
-  hono@4.11.1:
-    resolution: {integrity: sha512-KsFcH0xxHes0J4zaQgWbYwmz3UPOOskdqZmItstUG93+Wk1ePBLkLGwbP9zlmh1BFUiL8Qp+Xfu9P7feJWpGNg==}
+  hono@4.11.7:
+    resolution: {integrity: sha512-l7qMiNee7t82bH3SeyUCt9UF15EVmaBvsppY2zQtrbIhl/yzBTny+YUxsVjSjQ6gaqaeVtZmGocom8TzBlA4Yw==}
     engines: {node: '>=16.9.0'}
 
   resolve-pkg-maps@1.0.0:
@@ -311,13 +311,13 @@ snapshots:
   '@esbuild/win32-x64@0.27.2':
     optional: true
 
-  '@hono/node-server@1.19.9(hono@4.11.1)':
+  '@hono/node-server@1.19.9(hono@4.11.7)':
     dependencies:
-      hono: 4.11.1
+      hono: 4.11.7
 
-  '@hono/zod-validator@0.5.0(hono@4.11.1)(zod@3.25.76)':
+  '@hono/zod-validator@0.5.0(hono@4.11.7)(zod@3.25.76)':
     dependencies:
-      hono: 4.11.1
+      hono: 4.11.7
       zod: 3.25.76
 
   esbuild@0.27.2:
@@ -356,7 +356,7 @@ snapshots:
     dependencies:
       resolve-pkg-maps: 1.0.0
 
-  hono@4.11.1: {}
+  hono@4.11.7: {}
 
   resolve-pkg-maps@1.0.0: {}
 
