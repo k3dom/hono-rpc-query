@@ -34,18 +34,18 @@
     "format:check": "oxfmt --check ."
   },
   "devDependencies": {
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/git": "^10.0.1",
-    "@tanstack/react-query": "^5.81.2",
+    "@semantic-release/changelog": "6.0.3",
+    "@semantic-release/git": "10.0.1",
+    "@tanstack/react-query": "5.90.12",
     "@vitest/coverage-v8": "4.0.16",
-    "hono": "^4.8.2",
-    "oxfmt": "^0.23.0",
-    "oxlint": "^1.38.0",
-    "oxlint-tsgolint": "^0.11.0",
-    "semantic-release": "^25.0.2",
-    "tsdown": "^0.18.1",
-    "typescript": "^5.8.3",
-    "vitest": "^4.0.15"
+    "hono": "4.11.3",
+    "oxfmt": "0.23.0",
+    "oxlint": "1.38.0",
+    "oxlint-tsgolint": "0.11.0",
+    "semantic-release": "25.0.2",
+    "tsdown": "0.18.3",
+    "typescript": "5.9.3",
+    "vitest": "4.0.16"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.75.5",
