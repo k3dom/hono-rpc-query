@@ -13,7 +13,7 @@ importers:
         version: 5.90.12(react@19.2.4)
       hono:
         specifier: ^4.8.2
-        version: 4.11.1
+        version: 4.11.7
       hono-rpc-query:
         specifier: link:../..
         version: link:../..
@@ -515,8 +515,8 @@ packages:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
     engines: {node: '>=6.9.0'}
 
-  hono@4.11.1:
-    resolution: {integrity: sha512-KsFcH0xxHes0J4zaQgWbYwmz3UPOOskdqZmItstUG93+Wk1ePBLkLGwbP9zlmh1BFUiL8Qp+Xfu9P7feJWpGNg==}
+  hono@4.11.7:
+    resolution: {integrity: sha512-l7qMiNee7t82bH3SeyUCt9UF15EVmaBvsppY2zQtrbIhl/yzBTny+YUxsVjSjQ6gaqaeVtZmGocom8TzBlA4Yw==}
     engines: {node: '>=16.9.0'}
 
   js-tokens@4.0.0:
@@ -1035,7 +1035,7 @@ snapshots:
 
   gensync@1.0.0-beta.2: {}
 
-  hono@4.11.1: {}
+  hono@4.11.7: {}
 
   js-tokens@4.0.0: {}
 
