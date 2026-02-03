@@ -43,7 +43,7 @@
     "oxlint": "1.38.0",
     "oxlint-tsgolint": "0.11.3",
     "semantic-release": "25.0.2",
-    "tsdown": "0.18.3",
+    "tsdown": "0.20.1",
     "typescript": "5.9.3",
     "vitest": "4.0.18"
   },
