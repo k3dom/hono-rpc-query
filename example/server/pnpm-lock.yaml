@@ -13,13 +13,13 @@ importers:
         version: 1.19.9(hono@4.11.7)
       '@hono/zod-validator':
         specifier: ^0.7.0
-        version: 0.7.6(hono@4.11.7)(zod@3.25.76)
+        version: 0.7.6(hono@4.11.7)(zod@4.3.6)
       hono:
         specifier: ^4.8.2
         version: 4.11.7
       zod:
-        specifier: ^3.25.67
-        version: 3.25.76
+        specifier: ^4.0.0
+        version: 4.3.6
     devDependencies:
       tsx:
         specifier: 4.21.0
@@ -228,8 +228,8 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  zod@3.25.76:
-    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+  zod@4.3.6:
+    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
 
 snapshots:
 
@@ -315,10 +315,10 @@ snapshots:
     dependencies:
       hono: 4.11.7
 
-  '@hono/zod-validator@0.7.6(hono@4.11.7)(zod@3.25.76)':
+  '@hono/zod-validator@0.7.6(hono@4.11.7)(zod@4.3.6)':
     dependencies:
       hono: 4.11.7
-      zod: 3.25.76
+      zod: 4.3.6
 
   esbuild@0.27.2:
     optionalDependencies:
@@ -369,4 +369,4 @@ snapshots:
 
   typescript@5.9.3: {}
 
-  zod@3.25.76: {}
+  zod@4.3.6: {}
