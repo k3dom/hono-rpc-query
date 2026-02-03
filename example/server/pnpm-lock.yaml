@@ -12,8 +12,8 @@ importers:
         specifier: ^1.14.3
         version: 1.19.9(hono@4.11.7)
       '@hono/zod-validator':
-        specifier: ^0.5.0
-        version: 0.5.0(hono@4.11.7)(zod@3.25.76)
+        specifier: ^0.7.0
+        version: 0.7.6(hono@4.11.7)(zod@3.25.76)
       hono:
         specifier: ^4.8.2
         version: 4.11.7
@@ -192,11 +192,11 @@ packages:
     peerDependencies:
       hono: ^4
 
-  '@hono/zod-validator@0.5.0':
-    resolution: {integrity: sha512-ds5bW6DCgAnNHP33E3ieSbaZFd5dkV52ZjyaXtGoR06APFrCtzAsKZxTHwOrJNBdXsi0e5wNwo5L4nVEVnJUdg==}
+  '@hono/zod-validator@0.7.6':
+    resolution: {integrity: sha512-Io1B6d011Gj1KknV4rXYz4le5+5EubcWEU/speUjuw9XMMIaP3n78yXLhjd2A3PXaXaUwEAluOiAyLqhBEJgsw==}
     peerDependencies:
       hono: '>=3.9.0'
-      zod: ^3.19.1
+      zod: ^3.25.0 || ^4.0.0
 
   esbuild@0.27.2:
     resolution: {integrity: sha512-HyNQImnsOC7X9PMNaCIeAm4ISCQXs5a5YasTXVliKv4uuBo1dKrG0A+uQS8M5eXjVMnLg3WgXaKvprHlFJQffw==}
@@ -315,7 +315,7 @@ snapshots:
     dependencies:
       hono: 4.11.7
 
-  '@hono/zod-validator@0.5.0(hono@4.11.7)(zod@3.25.76)':
+  '@hono/zod-validator@0.7.6(hono@4.11.7)(zod@3.25.76)':
     dependencies:
       hono: 4.11.7
       zod: 3.25.76
