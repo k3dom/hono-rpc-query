@@ -9,6 +9,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    environment: release
     permissions:
       contents: write
       issues: write
@@ -20,17 +21,22 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Setup PNPM
-        uses: ./.github/actions/setup-pnpm
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@b5d848f5a62488f3d3d920f8aa6ac318a60c5f07 # v1
+        with:
+          node-version: '24'
+          cache: true
+
+      - run: vp install
 
       - name: Build
-        run: pnpm run build
+        run: vp pack
 
       - name: Verify provenance and registry signatures for dependencies
-        run: pnpm audit signatures
+        run: vp pm audit
 
       - name: Release
-        run: pnpm exec semantic-release
+        run: vp exec semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

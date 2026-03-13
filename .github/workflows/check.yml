@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   check:
-    name: Lint, Type Check & Test
+    name: Check, Test and Build
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -21,23 +21,22 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Setup PNPM
-        uses: ./.github/actions/setup-pnpm
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@b5d848f5a62488f3d3d920f8aa6ac318a60c5f07 # v1
+        with:
+          node-version: '24'
+          cache: true
 
-      - name: Check build
-        run: pnpm run build
+      - run: vp install
 
-      - name: Check formatting
-        run: pnpm run format:check
-
-      - name: Lint
-        run: pnpm run lint --deny-warnings
-
-      - name: Check types
-        run: pnpm run type-check
+      - name: Check
+        run: vp check
 
       - name: Test
-        run: pnpm run test
+        run: vp test --coverage
+
+      - name: Build
+        run: vp pack
 
       - name: Upload coverage report
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
