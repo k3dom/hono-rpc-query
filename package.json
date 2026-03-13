@@ -7,12 +7,12 @@
     "react query",
     "rpc"
   ],
-  "homepage": "https://github.com/kedom1337/hono-rpc-query",
+  "homepage": "https://github.com/k3dom/hono-rpc-query",
   "license": "MIT",
-  "author": "kedom1337",
+  "author": "k3dom",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kedom1337/hono-rpc-query.git"
+    "url": "git+https://github.com/k3dom/hono-rpc-query.git"
   },
   "files": [
     "dist"
@@ -23,31 +23,26 @@
     ".": "./dist/index.mjs",
     "./package.json": "./package.json"
   },
-  "scripts": {
-    "build": "tsdown",
-    "type-check": "tsc -b",
-    "test": "vitest --coverage",
-    "lint": "oxlint --type-aware --type-check",
-    "format": "oxfmt .",
-    "format:check": "oxfmt --check ."
-  },
   "devDependencies": {
     "@semantic-release/changelog": "6.0.3",
     "@semantic-release/git": "10.0.1",
-    "@tanstack/react-query": "5.90.20",
-    "@vitest/coverage-v8": "4.0.18",
-    "hono": "4.11.7",
-    "oxfmt": "0.27.0",
-    "oxlint": "1.42.0",
-    "oxlint-tsgolint": "0.11.3",
-    "semantic-release": "25.0.2",
-    "tsdown": "0.20.1",
+    "@tanstack/react-query": "5.90.21",
+    "@vitest/coverage-v8": "4.1.0",
+    "hono": "4.12.7",
+    "semantic-release": "25.0.3",
     "typescript": "5.9.3",
-    "vitest": "4.0.18"
+    "vite-plus": "latest",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@^0.1.11"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.75.5",
     "hono": "^4.7.8"
   },
-  "packageManager": "pnpm@10.28.2"
+  "packageManager": "pnpm@10.28.2",
+  "pnpm": {
+    "overrides": {
+      "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+      "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+    }
+  }
 }
