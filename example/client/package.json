@@ -8,11 +8,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.81.2",
-    "hono": "^4.8.2",
+    "@tanstack/react-query": "^5.90.21",
+    "hono": "^4.12.7",
     "hono-rpc-query": "link:../..",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
   },
   "devDependencies": {
     "@types/react": "19.2.14",
@@ -20,5 +20,6 @@
     "@vitejs/plugin-react": "5.1.4",
     "typescript": "5.9.3",
     "vite": "7.3.1"
-  }
+  },
+  "packageManager": "pnpm@10.32.1"
 }

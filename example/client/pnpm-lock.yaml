@@ -9,19 +9,19 @@ importers:
   .:
     dependencies:
       '@tanstack/react-query':
-        specifier: ^5.81.2
+        specifier: ^5.90.21
         version: 5.90.21(react@19.2.4)
       hono:
-        specifier: ^4.8.2
+        specifier: ^4.12.7
         version: 4.12.7
       hono-rpc-query:
         specifier: link:../..
         version: link:../..
       react:
-        specifier: ^19.1.0
+        specifier: ^19.2.4
         version: 19.2.4
       react-dom:
-        specifier: ^19.1.0
+        specifier: ^19.2.4
         version: 19.2.4(react@19.2.4)
     devDependencies:
       '@types/react':

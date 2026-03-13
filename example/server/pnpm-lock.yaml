@@ -9,16 +9,16 @@ importers:
   .:
     dependencies:
       '@hono/node-server':
-        specifier: ^1.14.3
+        specifier: ^1.19.11
         version: 1.19.11(hono@4.12.7)
       '@hono/zod-validator':
-        specifier: ^0.7.0
+        specifier: ^0.7.6
         version: 0.7.6(hono@4.12.7)(zod@4.3.6)
       hono:
-        specifier: ^4.8.2
+        specifier: ^4.12.7
         version: 4.12.7
       zod:
-        specifier: ^4.0.0
+        specifier: ^4.3.6
         version: 4.3.6
     devDependencies:
       tsx:
