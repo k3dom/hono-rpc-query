@@ -21,7 +21,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup Vite+
-        uses: voidzero-dev/setup-vp@1bc2c0c101cb14b233d41d9f113658852e3ba658 # v1
+        uses: voidzero-dev/setup-vp@b5d848f5a62488f3d3d920f8aa6ac318a60c5f07 # v1
         with:
           node-version: '24'
           cache: true
