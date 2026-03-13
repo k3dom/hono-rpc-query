@@ -38,7 +38,7 @@
     "@tanstack/react-query": "^5.75.5",
     "hono": "^4.7.8"
   },
-  "packageManager": "pnpm@10.28.2",
+  "packageManager": "pnpm@10.32.0",
   "pnpm": {
     "overrides": {
       "vite": "npm:@voidzero-dev/vite-plus-core@latest",
