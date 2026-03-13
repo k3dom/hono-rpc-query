@@ -36,7 +36,7 @@ function App() {
     })
   )
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault()
     if (title && content) {
       createMutation.mutate({ json: { title, content } })
