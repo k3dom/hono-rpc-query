@@ -1,3 +1,11 @@
+## [1.5.1](https://github.com/k3dom/hono-rpc-query/compare/v1.5.0...v1.5.1) (2026-03-13)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @hono/zod-validator to ^0.7.0 ([#32](https://github.com/k3dom/hono-rpc-query/issues/32)) ([32e8d93](https://github.com/k3dom/hono-rpc-query/commit/32e8d939d0cb60641ad1f9ed3cc0c4085524ec87))
+* **deps:** update dependency zod to v4 ([#35](https://github.com/k3dom/hono-rpc-query/issues/35)) ([fe56acd](https://github.com/k3dom/hono-rpc-query/commit/fe56acdb0a2d2b4c2950f82ce1877eb4e0bd4512))
+
 # [1.5.0](https://github.com/kedom1337/hono-rpc-query/compare/v1.4.0...v1.5.0) (2026-01-09)
 
 
