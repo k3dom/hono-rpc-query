@@ -26,7 +26,7 @@
   "devDependencies": {
     "@semantic-release/changelog": "6.0.3",
     "@semantic-release/git": "10.0.1",
-    "@tanstack/react-query": "5.90.21",
+    "@tanstack/react-query": "5.96.1",
     "@vitest/coverage-v8": "4.1.0",
     "hono": "4.12.7",
     "semantic-release": "25.0.3",
