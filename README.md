@@ -154,6 +154,17 @@ const options = api.posts.$get.queryOptions({
 useQuery(options)
 ```
 
+#### Query cancellation
+
+By default, `queryOptions()` does not consume TanStack Query's `AbortSignal`, matching TanStack Query's default behavior. If you want requests to be aborted when TanStack Query cancels a query, opt in with `abortOnCancel`:
+
+```typescript
+const options = api.posts.$get.queryOptions({
+  input: { param: { id: 1 } },
+  abortOnCancel: true,
+})
+```
+
 ### `mutationOptions(config)`
 
 Generates TanStack Query options for POST, PUT, DELETE requests. Returns an object with `mutationKey` and `mutationFn`.

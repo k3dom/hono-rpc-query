@@ -23,8 +23,9 @@ export interface QueryEndpoint<TEndpoint extends ClientRequestEndpoint> {
     args: Omit<
       UseQueryOptions<InferResponseType<TEndpoint>>,
       'queryKey' | 'queryFn'
-    > &
-      ({} extends InferRequestType<TEndpoint>
+    > & {
+      abortOnCancel?: boolean
+    } & ({} extends InferRequestType<TEndpoint>
         ? { input?: undefined }
         : { input: InferRequestType<TEndpoint> })
   ) => {
@@ -55,15 +56,17 @@ function createHcQueryEndpoint<TEndpoint extends ClientRequestEndpoint>(
   return {
     call: endpoint,
     queryOptions(args) {
-      const { input, ...rest } = args
+      const { input, abortOnCancel = false, ...rest } = args
       return {
         ...rest,
         queryKey: buildKey(path, {
           type: 'query',
           input: input,
         }),
-        queryFn: async ({ signal }) => {
-          const res = await endpoint(input, { init: { signal } })
+        queryFn: async (context) => {
+          const res = abortOnCancel
+            ? await endpoint(input, { init: { signal: context.signal } })
+            : await endpoint(input)
           return (await res.json()) as InferResponseType<TEndpoint>
         },
       }
