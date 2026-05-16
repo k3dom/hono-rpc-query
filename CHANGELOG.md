@@ -1,3 +1,13 @@
+# [2.0.0](https://github.com/k3dom/hono-rpc-query/compare/v1.5.1...v2.0.0) (2026-05-16)
+
+
+* fix!: make query cancellation opt-in ([#62](https://github.com/k3dom/hono-rpc-query/issues/62)) ([2b0d948](https://github.com/k3dom/hono-rpc-query/commit/2b0d948122df8a26a4a3f84844da6f3163cf6fac))
+
+
+### BREAKING CHANGES
+
+* queryOptions no longer passes TanStack Query's AbortSignal to Hono requests by default. Use abortOnCancel: true to preserve automatic request abortion on query cancellation.
+
 ## [1.5.1](https://github.com/k3dom/hono-rpc-query/compare/v1.5.0...v1.5.1) (2026-03-13)
 
 

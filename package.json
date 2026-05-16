@@ -1,6 +1,6 @@
 {
   "name": "hono-rpc-query",
-  "version": "1.5.1",
+  "version": "2.0.0",
   "description": "Integration for Hono's RPC client with React Query",
   "keywords": [
     "hono",
