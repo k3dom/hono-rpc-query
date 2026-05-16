@@ -7,14 +7,14 @@
     "start": "tsx src/index.ts"
   },
   "dependencies": {
-    "@hono/node-server": "^1.19.11",
-    "@hono/zod-validator": "^0.7.6",
-    "hono": "^4.12.7",
-    "zod": "^4.3.6"
+    "@hono/node-server": "^2.0.2",
+    "@hono/zod-validator": "^0.8.0",
+    "hono": "^4.12.18",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "tsx": "4.21.0",
-    "typescript": "5.9.3"
+    "tsx": "4.22.0",
+    "typescript": "6.0.3"
   },
   "packageManager": "pnpm@10.33.4"
 }
