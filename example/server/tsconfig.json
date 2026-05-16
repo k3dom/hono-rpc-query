@@ -2,16 +2,13 @@
   "compilerOptions": {
     "tsBuildInfoFile": "${configDir}/node_modules/.tmp/tsconfig.tsbuildinfo",
 
-    "module": "esnext",
     "target": "esnext",
     "lib": ["ESNext", "DOM"],
 
-    "strict": true,
     "jsx": "react-jsx",
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "moduleDetection": "force",
-    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "allowJs": true,
@@ -23,9 +20,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedSideEffectImports": true,
-    "forceConsistentCasingInFileNames": true
+    "noPropertyAccessFromIndexSignature": true
   },
   "include": ["**/*"],
   "exclude": ["dist"]
