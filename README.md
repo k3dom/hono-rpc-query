@@ -1,6 +1,10 @@
 # 🔥 hono-rpc-query
 
-Eliminates boilerplate when integrating Hono's RPC client with TanStack React Query by automatically generating type-safe `queryOptions` and `mutationOptions` for all your endpoints.
+[![npm version](https://img.shields.io/npm/v/hono-rpc-query.svg)](https://www.npmjs.com/package/hono-rpc-query)
+[![npm downloads](https://img.shields.io/npm/dm/hono-rpc-query.svg)](https://www.npmjs.com/package/hono-rpc-query)
+[![license](https://img.shields.io/npm/l/hono-rpc-query.svg)](https://github.com/k3dom/hono-rpc-query/blob/master/LICENSE)
+
+Stop hand-writing TanStack Query `queryFn` wrappers around your Hono RPC client. `hono-rpc-query` bridges the two by generating fully type-safe `queryOptions` and `mutationOptions` for every endpoint.
 
 ## Installation
 
@@ -73,10 +77,10 @@ import { api } from './api'
 function App() {
   const queryClient = useQueryClient()
 
-  // Fetch all posts - note the empty object {} is required even with no input
+  // Fetch all posts
   const postsQuery = useQuery(api.posts.$get.queryOptions({}))
 
-  // Create post mutation - pass options directly to mutationOptions()
+  // Create post mutation and pass options directly to mutationOptions()
   const createPost = useMutation(
     api.posts.$post.mutationOptions({
       onSuccess: () => {
@@ -101,14 +105,13 @@ function App() {
 
 Generates TanStack Query options for GET requests. Returns an object with `queryKey` and `queryFn`.
 
-**Important:** You must always pass an object to `queryOptions()`, even when there are no input arguments. Pass an empty object `{}` if no input is needed.
+> [!IMPORTANT]
+> You must always pass an object to `queryOptions()`, even when there are no input arguments. Pass an empty object `{}` if no input is needed.
 
 #### Usage with no input
 
 ```typescript
-// Endpoint with no parameters
 const options = api.posts.$get.queryOptions({})
-// Returns: { queryKey: [...], queryFn: ... }
 
 useQuery(options)
 ```
@@ -116,7 +119,6 @@ useQuery(options)
 #### Usage with input parameters
 
 ```typescript
-// Endpoint with path parameters
 const options = api.posts[':id'].$get.queryOptions({
   input: {
     param: { id: '1' },
@@ -129,7 +131,6 @@ useQuery(options)
 #### Usage with json parameters
 
 ```typescript
-// Endpoint with query string
 const options = api.posts.$get.queryOptions({
   input: {
     json: { page: 1, limit: 10 },
@@ -145,7 +146,7 @@ You can pass any TanStack Query options alongside the input:
 
 ```typescript
 const options = api.posts.$get.queryOptions({
-  input: { param: { id: 1 } },
+  input: { param: { id: '1' } },
   enabled: true,
   staleTime: 5000,
   refetchOnWindowFocus: false,
@@ -160,24 +161,25 @@ By default, `queryOptions()` does not consume TanStack Query's `AbortSignal`, ma
 
 ```typescript
 const options = api.posts.$get.queryOptions({
-  input: { param: { id: 1 } },
+  input: { param: { id: '1' } },
   abortOnCancel: true,
 })
 ```
+
+---
 
 ### `mutationOptions(config)`
 
 Generates TanStack Query options for POST, PUT, DELETE requests. Returns an object with `mutationKey` and `mutationFn`.
 
-**Important:** You must always pass an object to `mutationOptions()`, even when configuring no additional options. Pass an empty object `{}` if no config is needed.
+> [!IMPORTANT]
+> You must always pass an object to `mutationOptions()`, even when configuring no additional options. Pass an empty object `{}` if no config is needed.
 
 #### Basic usage
 
 ```typescript
-// Always pass an object, even if empty
 const mutation = useMutation(api.posts.$post.mutationOptions({}))
 
-// Call the mutation with input
 mutation.mutate({ json: { title: 'New Post', content: 'Content' } })
 ```
 
@@ -186,16 +188,16 @@ mutation.mutate({ json: { title: 'New Post', content: 'Content' } })
 Pass additional mutation options directly to `mutationOptions()`:
 
 ```typescript
-const mutation = useMutation(
-  api.posts.$post.mutationOptions({
-    onSuccess: (data) => {
-      console.log('Created:', data)
-    },
-    onError: (error) => {
-      console.error('Failed:', error)
-    },
-  })
-)
+const options = api.posts.$post.mutationOptions({
+  onSuccess: (data) => {
+    console.log('Created:', data)
+  },
+  onError: (error) => {
+    console.error('Failed:', error)
+  },
+})
+
+const mutation = useMutation(options)
 ```
 
 #### DELETE request example
@@ -212,9 +214,10 @@ const deleteMutation = useMutation(
   })
 )
 
-// Call with parameters
 deleteMutation.mutate({ param: { id: '1' } })
 ```
+
+---
 
 ### Accessing Query Keys
 
@@ -239,7 +242,7 @@ const cachedData = queryClient.getQueryData(queryKey)
 ```typescript
 // Query key includes the input parameters
 const queryKey = api.posts[':id'].$get.queryOptions({
-  input: { param: { id: 1 } },
+  input: { param: { id: '1' } },
 }).queryKey
 
 // Invalidate a specific post
