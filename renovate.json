@@ -5,7 +5,20 @@
   "description": "Schedule on the first day of every month",
   "schedule": ["* * 1 * *"],
   "labels": ["dependencies"],
+  "minimumReleaseAge": "3 days",
   "nix": {
     "enabled": true
-  }
+  },
+  "packageRules": [
+    {
+      "description": "Vite+ bundles Vitest at an exact version and rejects a mismatched coverage provider, so the toolchain has to move in lockstep",
+      "groupName": "vite-plus toolchain",
+      "matchPackageNames": [
+        "vite-plus",
+        "vitest",
+        "@vitest/**",
+        "@voidzero-dev/vite-plus-core"
+      ]
+    }
+  ]
 }
