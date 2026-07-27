@@ -219,6 +219,31 @@ deleteMutation.mutate({ param: { id: '1' } })
 
 ---
 
+### Error handling
+
+Non-2xx responses reject with `HonoResponseError`, so failures reach `error` instead of `data`. `data` is narrowed to the endpoint's success responses, and 204/205 resolve to `null`.
+
+```typescript
+import { HonoResponseError } from 'hono-rpc-query'
+
+const { data, error } = useQuery(api.posts[':id'].$get.queryOptions({}))
+
+if (error instanceof HonoResponseError) {
+  error.status // 404
+  error.data // parsed body: json, raw text, or undefined when empty
+  error.response // metadata only, the body is already read
+}
+```
+
+TanStack Query's default `retry: 3` now applies to 4xx. To skip those, set a predicate on your `QueryClient`:
+
+```typescript
+retry: (failureCount, error) =>
+  error instanceof HonoResponseError && error.status < 500 ? false : failureCount < 3
+```
+
+---
+
 ### Accessing Query Keys
 
 You can access the generated query key for cache invalidation or other purposes:

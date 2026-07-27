@@ -1,4 +1,5 @@
 import type {
+  DefaultError,
   QueryFunctionContext,
   QueryKey,
   UseMutationOptions,
@@ -10,6 +11,8 @@ import type {
   InferRequestType,
   InferResponseType,
 } from 'hono/client'
+import type { SuccessStatusCode } from 'hono/utils/http-status'
+import { HonoResponseError } from './error'
 import { buildKey } from './key'
 
 type ClientRequestEndpoint = (
@@ -17,11 +20,38 @@ type ClientRequestEndpoint = (
   options?: ClientRequestOptions
 ) => Promise<ClientResponse<unknown>>
 
+type SuccessResponse<TEndpoint extends ClientRequestEndpoint> = InferResponseType<
+  TEndpoint,
+  SuccessStatusCode
+>
+
+async function parseResponse<TData>(res: ClientResponse<unknown>): Promise<TData> {
+  if (!res.ok) {
+    // A failed json() drains the body, leaving nothing to report for html pages.
+    const raw = await res.text()
+    let data: unknown
+    try {
+      data = JSON.parse(raw)
+    } catch {
+      data = raw || undefined
+    }
+
+    throw new HonoResponseError(res as unknown as Response, data)
+  }
+
+  // json() throws on an empty body, and TanStack Query rejects undefined as data.
+  if (res.status === 204 || res.status === 205) {
+    return null as TData
+  }
+
+  return (await res.json()) as TData
+}
+
 export interface QueryEndpoint<TEndpoint extends ClientRequestEndpoint> {
   call: TEndpoint
   queryOptions: (
     args: Omit<
-      UseQueryOptions<InferResponseType<TEndpoint>>,
+      UseQueryOptions<SuccessResponse<TEndpoint>>,
       'queryKey' | 'queryFn'
     > & {
       abortOnCancel?: boolean
@@ -30,13 +60,13 @@ export interface QueryEndpoint<TEndpoint extends ClientRequestEndpoint> {
         : { input: InferRequestType<TEndpoint> })
   ) => {
     queryKey: QueryKey
-    queryFn: (opts: QueryFunctionContext) => Promise<InferResponseType<TEndpoint>>
+    queryFn: (opts: QueryFunctionContext) => Promise<SuccessResponse<TEndpoint>>
   }
   mutationOptions: (
     args: Omit<
       UseMutationOptions<
-        InferResponseType<TEndpoint>,
-        Error,
+        SuccessResponse<TEndpoint>,
+        DefaultError,
         InferRequestType<TEndpoint>
       >,
       'mutationKey' | 'mutationFn'
@@ -45,7 +75,7 @@ export interface QueryEndpoint<TEndpoint extends ClientRequestEndpoint> {
     mutationKey: QueryKey
     mutationFn: (
       input: InferRequestType<TEndpoint>
-    ) => Promise<InferResponseType<TEndpoint>>
+    ) => Promise<SuccessResponse<TEndpoint>>
   }
 }
 
@@ -67,7 +97,7 @@ function createHcQueryEndpoint<TEndpoint extends ClientRequestEndpoint>(
           const res = abortOnCancel
             ? await endpoint(input, { init: { signal: context.signal } })
             : await endpoint(input)
-          return (await res.json()) as InferResponseType<TEndpoint>
+          return parseResponse<SuccessResponse<TEndpoint>>(res)
         },
       }
     },
@@ -79,7 +109,7 @@ function createHcQueryEndpoint<TEndpoint extends ClientRequestEndpoint>(
         }),
         mutationFn: async (input) => {
           const res = await endpoint(input)
-          return (await res.json()) as InferResponseType<TEndpoint>
+          return parseResponse<SuccessResponse<TEndpoint>>(res)
         },
       }
     },

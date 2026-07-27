@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { HonoResponseError } from 'hono-rpc-query'
 import { useState } from 'react'
 import { api } from './api'
 
@@ -77,8 +78,14 @@ function App() {
 
       <h2>Posts</h2>
       {postsQuery.isLoading && <p>Loading posts...</p>}
-      {postsQuery.error && <p>Error: {postsQuery.error.message}</p>}
-      {postsQuery.data && Array.isArray(postsQuery.data) && (
+      {postsQuery.error && (
+        <p>
+          {postsQuery.error instanceof HonoResponseError
+            ? `Server responded with ${postsQuery.error.status}`
+            : postsQuery.error.message}
+        </p>
+      )}
+      {postsQuery.data && (
         <ul style={{ listStyle: 'none', padding: 0 }}>
           {postsQuery.data.map((post) => (
             <li
