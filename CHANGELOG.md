@@ -1,3 +1,5 @@
+# hono-rpc-query
+
 # [2.0.0](https://github.com/k3dom/hono-rpc-query/compare/v1.5.1...v2.0.0) (2026-05-16)
 
 
