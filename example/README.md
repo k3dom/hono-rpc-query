@@ -14,8 +14,8 @@ A minimal example demonstrating how to use `hono-rpc-query` to integrate Hono RP
 From the root of the repository, build the library first:
 
 ```bash
-pnpm install
-pnpm build
+vp install
+vp pack
 ```
 
 Then install dependencies for the example:
