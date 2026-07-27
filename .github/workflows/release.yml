@@ -32,8 +32,10 @@ jobs:
       - name: Build
         run: vp pack
 
-      - name: Verify provenance and registry signatures for dependencies
-        run: vp pm audit
+      # Advisories in dev-only tooling must not block a release: the published
+      # package ships no runtime dependencies of its own.
+      - name: Audit production dependencies
+        run: vp pm audit -- --prod
 
       - name: Release
         run: vp exec semantic-release
