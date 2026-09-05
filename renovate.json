@@ -9,16 +9,84 @@
   "nix": {
     "enabled": true
   },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["* * 1 * *"]
+  },
+  "customDatasources": {
+    "vite-plus-toolchain": {
+      "defaultRegistryUrlTemplate": "https://registry.npmjs.org/vite-plus",
+      "format": "json",
+      "transformTemplates": [
+        "($release := $lookup(versions, $.'dist-tags'.latest); $exact := /^[0-9]+\\.[0-9]+\\.[0-9]+$/; $runner := $replace($release.dependencies.vitest, /^=/, ''); $core := $replace($lookup($release.dependencies, '@voidzero-dev/vite-plus-core'), /^=/, ''); $assert($exists($match($release.version, $exact)) and $exists($match($runner, $exact)) and $exists($match($core, $exact)) and ($release.deprecated ? false : true), 'Vite+ latest must declare exact stable runner and core versions'); {'releases': [{'version': '{{{packageName}}}' = 'vite-plus' ? $release.version : '{{{packageName}}}' = '@voidzero-dev/vite-plus-core' ? $core : $runner, 'releaseTimestamp': $lookup(time, $release.version)}], 'sourceUrl': 'https://github.com/voidzero-dev/vite-plus', 'homepage': 'https://viteplus.dev'})"
+      ]
+    }
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "The setup-uv version input is handled natively by github-actions; extract only the uvx tool pin here",
+      "managerFilePatterns": ["/^[.]github/workflows/zizmor[.]ya?ml$/"],
+      "matchStrings": [
+        "\\buvx[ \\t]+zizmor==(?<currentValue>[0-9]+\\.[0-9]+\\.[0-9]+)\\b"
+      ],
+      "depNameTemplate": "zizmor",
+      "datasourceTemplate": "pypi",
+      "versioningTemplate": "pep440"
+    },
+    {
+      "customType": "regex",
+      "description": "Track the versioned Changesets configuration schema, not the CLI version",
+      "managerFilePatterns": ["/^[.]changeset/config[.]json$/"],
+      "matchStrings": [
+        "https://unpkg\\.com/@changesets/config@(?<currentValue>[0-9]+\\.[0-9]+\\.[0-9]+)/schema\\.json"
+      ],
+      "depNameTemplate": "@changesets/config",
+      "datasourceTemplate": "npm"
+    }
+  ],
   "packageRules": [
     {
-      "description": "Vite+ bundles Vitest at an exact version and rejects a mismatched coverage provider, so the toolchain has to move in lockstep",
-      "groupName": "vite-plus toolchain",
+      "description": "Project every toolchain target from the same Vite+ latest manifest, never from standalone Vitest/core releases. Wait for that Vite+ release together; no older-release fallback. Example Vite stays independent. Rollbacks are disabled because this datasource intentionally exposes only the target, not historical versions.",
+      "matchManagers": ["npm"],
+      "matchFileNames": ["pnpm-workspace.yaml"],
       "matchPackageNames": [
         "vite-plus",
         "vitest",
-        "@vitest/**",
+        "@vitest/coverage-v8",
         "@voidzero-dev/vite-plus-core"
-      ]
+      ],
+      "overrideDatasource": "custom.vite-plus-toolchain",
+      "registryUrls": [],
+      "versioning": "npm",
+      "groupName": "vite-plus toolchain",
+      "separateMajorMinor": false,
+      "minimumReleaseAge": "3 days",
+      "minimumReleaseAgeBehaviour": "timestamp-required",
+      "internalChecksFilter": "strict",
+      "rollbackPrs": false
+    },
+    {
+      "description": "Keep CLI/action major migrations and the independently versioned schema in one PR",
+      "matchPackageNames": [
+        "@changesets/cli",
+        "@changesets/config",
+        "changesets/action"
+      ],
+      "groupName": "changesets",
+      "separateMajorMinor": false
+    },
+    {
+      "description": "Keep packageManager pins in the root and independent examples together with the installer action",
+      "matchPackageNames": ["pnpm", "pnpm/action-setup"],
+      "groupName": "pnpm",
+      "separateMajorMinor": false
+    },
+    {
+      "description": "Preserve the published library's compatibility floor, including when dev dependencies are pinned",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["peerDependencies"],
+      "rangeStrategy": "widen"
     }
   ]
 }

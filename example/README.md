@@ -14,15 +14,15 @@ A minimal example demonstrating how to use `hono-rpc-query` to integrate Hono RP
 From the root of the repository, build the library first:
 
 ```bash
-vp install
-vp pack
+pnpm install --frozen-lockfile
+pnpm build
 ```
 
-Then install dependencies for the example:
+Each example has its own workspace boundary and lockfile, so installs (including Renovate updates) stay independent of the library's Vite+ toolchain:
 
 ```bash
-cd example/server && pnpm install
-cd ../client && pnpm install
+pnpm --dir example/server install --frozen-lockfile
+pnpm --dir example/client install --frozen-lockfile
 ```
 
 ### 2. Start the Server
@@ -44,6 +44,17 @@ pnpm dev
 ```
 
 The client will start on http://localhost:5173
+
+### 4. Verify the Example
+
+From the repository root, after building the library and installing both examples:
+
+```bash
+pnpm --dir example/server typecheck
+pnpm --dir example/client build
+```
+
+These checks also run in CI. Use Node.js 24 LTS and the pnpm version pinned in `package.json` (Corepack selects it automatically).
 
 ## How It Works
 

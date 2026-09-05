@@ -1,0 +1,4 @@
+# Keep this example independent of the library's workspace and lockfile.
+packages: []
+allowBuilds:
+  esbuild: true
