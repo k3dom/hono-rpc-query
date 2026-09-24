@@ -111,16 +111,16 @@ importers:
     dependencies:
       '@hono/node-server':
         specifier: ^2.1.1
-        version: 2.1.1(hono@4.13.7)
+        version: 2.1.1(hono@4.13.8)
       '@hono/zod-validator':
         specifier: ^0.9.1
-        version: 0.9.1(hono@4.13.7)(zod@4.5.4)
+        version: 0.9.1(hono@4.13.8)(zod@4.6.5)
       hono:
         specifier: ^4.13.7
-        version: 4.13.7
+        version: 4.13.8
       zod:
         specifier: ^4.5.4
-        version: 4.5.4
+        version: 4.6.5
     devDependencies:
       tsx:
         specifier: 4.23.13
@@ -429,8 +429,8 @@ packages:
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
 
-  hono@4.13.7:
-    resolution: {integrity: sha512-c8/gF9ac8Y78/agExVocyLevgR+JlpNB444Py0FSX8pJoPdYUfUzRcXtYEYGwt6l19qIlVZPN5Mfsw9jFShmQQ==}
+  hono@4.13.8:
+    resolution: {integrity: sha512-/Gng7NfoykZl2pjukW5Z6+8Yxm3BPRf86GTbQnt0SbySkvax4fyL4H3HhY1cCpBGmiW9XDRFzRV+CXK2W8QudQ==}
     engines: {node: '>=16.9.0'}
 
   tsx@4.23.13:
@@ -443,8 +443,8 @@ packages:
     engines: {node: '>=16.20.0'}
     hasBin: true
 
-  zod@4.5.4:
-    resolution: {integrity: sha512-sC95tT5iHHH9gtpj6A81kh+NEaRAUFN+qlUPDUbRfOMvNf5QCBqsb3WgvnpVtK5Y+4UfA6KqufotuTvMGiTlsA==}
+  zod@4.6.5:
+    resolution: {integrity: sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q==}
 
 snapshots:
 
@@ -526,14 +526,14 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
-  '@hono/node-server@2.1.1(hono@4.13.7)':
+  '@hono/node-server@2.1.1(hono@4.13.8)':
     dependencies:
-      hono: 4.13.7
+      hono: 4.13.8
 
-  '@hono/zod-validator@0.9.1(hono@4.13.7)(zod@4.5.4)':
+  '@hono/zod-validator@0.9.1(hono@4.13.8)(zod@4.6.5)':
     dependencies:
-      hono: 4.13.7
-      zod: 4.5.4
+      hono: 4.13.8
+      zod: 4.6.5
 
   '@typescript/typescript-aix-ppc64@7.0.2':
     optional: true
@@ -627,7 +627,7 @@ snapshots:
   fsevents@2.3.3:
     optional: true
 
-  hono@4.13.7: {}
+  hono@4.13.8: {}
 
   tsx@4.23.13:
     dependencies:
@@ -658,4 +658,4 @@ snapshots:
       '@typescript/typescript-win32-arm64': 7.0.2
       '@typescript/typescript-win32-x64': 7.0.2
 
-  zod@4.5.4: {}
+  zod@4.6.5: {}
