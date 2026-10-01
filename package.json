@@ -29,7 +29,7 @@
     "release": "changeset publish"
   },
   "devDependencies": {
-    "@changesets/cli": "3.0.2",
+    "@changesets/cli": "3.0.3",
     "@tanstack/react-query": "5.102.8",
     "@vitest/coverage-v8": "catalog:",
     "hono": "4.13.7",
