@@ -18,7 +18,7 @@ pnpm install --frozen-lockfile
 pnpm build
 ```
 
-Each example has its own workspace boundary and lockfile, so installs (including Renovate updates) stay independent of the library's Vite+ toolchain:
+Each example has its own workspace boundary and lockfile, so installs stay independent of the library's Vite+ toolchain:
 
 ```bash
 pnpm --dir example/server install --frozen-lockfile
