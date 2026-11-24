@@ -29,12 +29,12 @@ jobs:
           persist-credentials: false
 
       - name: Install uv
-        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
         with:
-          version: '0.12.10'
+          version: '0.13.9'
           enable-cache: false
 
       - name: Run zizmor
-        run: uvx zizmor==1.30.0 --format=github .
+        run: uvx zizmor==1.32.0 --format=github .
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
