@@ -1,5 +1,22 @@
 # hono-rpc-query
 
+## 3.1.0
+
+### Minor Changes
+
+- effe2c1: Fix text responses and non-standard methods, and make options optional.
+  
+  - Success responses are parsed by content type, as in `hono/client`'s `parseResponse`. Endpoints returning `c.text()` used to reject with a `SyntaxError`.
+  - Every `$`-prefixed request method is wrapped, including `$options` and custom methods from `app.on()`. Only `$get`, `$post`, `$put`, `$patch` and `$delete` worked before.
+  - `$url`, `$path` and `$ws` keep their hono client types and can be called.
+  - `queryOptions()` and `mutationOptions()` no longer need an empty `{}` when the endpoint requires no input, and such mutations can run with `mutate()`.
+  - `input` can be passed to endpoints whose input is all optional.
+- 60af1c7: Type `HonoResponseError` from the endpoint's declared error responses.
+  
+  The error of `queryOptions()` and `mutationOptions()` was always `Error`, so `error.data` was `unknown` even when the route declared its error bodies. `HonoResponseError` now takes the status and body as type parameters, and each endpoint's error is a union of its 4xx and 5xx responses, with JSON bodies typed, plus `Error` for network failures. `instanceof HonoResponseError` narrows to those responses, and checking `error.status` narrows `error.data`. This reaches `onError`, `useQuery` and `useMutation`.
+  
+  `queryOptions()` now also accepts a `select` that changes the data type, and returns the TanStack options it was given in its type. Its `queryKey` is tagged with the data and error types, so `queryClient.getQueryData(queryKey)` is typed.
+
 ## 3.0.0
 
 ### Major Changes
