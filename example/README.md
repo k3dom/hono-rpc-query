@@ -54,7 +54,7 @@ pnpm --dir example/server typecheck
 pnpm --dir example/client build
 ```
 
-These checks also run in CI. Use Node.js 26 LTS and the pnpm version pinned in `package.json` (Corepack selects it automatically).
+These checks also run in CI. Use Node.js 26 LTS and the pnpm version pinned in `package.json` (Corepack selects it once installed with `npm install -g corepack` and enabled).
 
 ## How It Works
 
