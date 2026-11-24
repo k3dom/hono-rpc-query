@@ -1,10 +1,10 @@
-# Examples have their own workspace boundaries and lockfiles.
-packages: []
+# Wait 3 days before installing a newly published version.
+minimumReleaseAge: 4320
 catalog:
-  vite: npm:@voidzero-dev/vite-plus-core@0.3.0
-  vitest: 4.1.11
-  vite-plus: 0.3.0
-  '@vitest/coverage-v8': 4.1.11
+  vite: npm:@voidzero-dev/vite-plus-core@8.3.8000
+  vitest: 5.1.0
+  vite-plus: 1.7.0
+  '@vitest/coverage-v8': 5.1.0
 overrides:
   vite@*: 'catalog:'
   vitest@*: 'catalog:'

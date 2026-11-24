@@ -16,7 +16,7 @@
         packages = with pkgs; [
           # Prefer standalone Corepack over the older copy bundled with Node.
           corepack
-          nodejs_24
+          nodejs_26
           alejandra
           statix
           deadnix

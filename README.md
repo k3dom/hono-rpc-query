@@ -22,8 +22,9 @@ yarn add hono-rpc-query
 
 ```typescript
 // server/index.ts
-import { Hono } from 'hono'
+
 import { zValidator } from '@hono/zod-validator'
+import { Hono } from 'hono'
 import { z } from 'zod'
 
 const app = new Hono()
@@ -63,8 +64,9 @@ export type AppRoutes = typeof routes
 
 ```typescript
 // client/api.ts
-import { hc } from 'hono/client'
+
 import { hcQuery } from 'hono-rpc-query'
+import { hc } from 'hono/client'
 import type { AppRoutes } from '../server'
 
 const client = hc<AppRoutes>('http://localhost:3001')
@@ -316,7 +318,7 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 Please make sure to update tests as appropriate.
 
-Use Node.js 24 LTS and Corepack to select the pinned pnpm version. Alternatively, `nix develop` provides Node, Corepack, and the Nix/workflow linters (Linux x86_64/ARM64 and Apple Silicon).
+Use Node.js 26 LTS and Corepack to select the pinned pnpm version. Node no longer bundles Corepack, so install it with `npm install -g corepack` and run `corepack enable`. Alternatively, `nix develop` provides Node, Corepack, and the Nix/workflow linters (Linux x86_64/ARM64 and Apple Silicon).
 
 ```bash
 pnpm install --frozen-lockfile
