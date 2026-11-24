@@ -229,7 +229,7 @@ const typedApi = hcQuery(hc<typeof typedApp>('http://api.test'))
 
 type PermissionsResponseError =
   | HonoResponseError<403, { code: 'FORBIDDEN'; missing: string[] }>
-  | HonoResponseError<404, 'Member not found'>
+  | HonoResponseError<404, unknown>
 
 type PermissionsError = PermissionsResponseError | Error
 
@@ -275,6 +275,15 @@ describe('types', () => {
     if (error instanceof HonoResponseError) {
       expectTypeOf(error.status).toEqualTypeOf<number>()
       expectTypeOf(error.data).toEqualTypeOf<unknown>()
+    }
+  })
+
+  it('narrows instanceof on a subclass to that subclass', () => {
+    class AuthError extends HonoResponseError<401, { reason: string }> {}
+    const error: unknown = new Error()
+
+    if (error instanceof AuthError) {
+      expectTypeOf(error).toEqualTypeOf<AuthError>()
     }
   })
 

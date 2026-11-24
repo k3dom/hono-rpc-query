@@ -6,11 +6,15 @@ export class HonoResponseError<
 
   // Without this, instanceof turns the `Error` member of a query's error union
   // into HonoResponseError<any, any>, which swallows the typed members.
-  static override [Symbol.hasInstance]<T>(
-    value: T
-  ): value is [Extract<T, HonoResponseError>] extends [never]
-    ? T & HonoResponseError
-    : Extract<T, HonoResponseError> {
+  static override [Symbol.hasInstance]<
+    TClass extends abstract new (...args: any) => HonoResponseError,
+    TValue,
+  >(
+    this: TClass,
+    value: TValue
+  ): value is [Extract<TValue, InstanceType<TClass>>] extends [never]
+    ? TValue & InstanceType<TClass>
+    : Extract<TValue, InstanceType<TClass>> {
     return Function.prototype[Symbol.hasInstance].call(this, value)
   }
 

@@ -38,7 +38,7 @@ type EndpointError<TEndpoint extends ClientRequestEndpoint> =
           ? never
           : HonoResponseError<
               Extract<TStatus, ClientErrorStatusCode | ServerErrorStatusCode>,
-              TFormat extends 'json' | 'text' ? TBody : unknown
+              TFormat extends 'json' ? TBody : unknown
             >
         : never
       : never)
@@ -77,10 +77,10 @@ export interface QueryEndpoint<TEndpoint extends ClientRequestEndpoint> {
     } & ({} extends InferRequestType<TEndpoint>
         ? { input?: undefined }
         : { input: InferRequestType<TEndpoint> })
-  ) => UseQueryOptions<
-    SuccessResponse<TEndpoint>,
-    EndpointError<TEndpoint>,
-    TData
+  ) => Omit<
+    UseQueryOptions<SuccessResponse<TEndpoint>, EndpointError<TEndpoint>, TData>,
+    // Its pageParam context conflicts with fetchQuery's before react-query 5.102.
+    'persister'
   > & {
     queryKey: DataTag<QueryKey, SuccessResponse<TEndpoint>, EndpointError<TEndpoint>>
     queryFn: (opts: QueryFunctionContext) => Promise<SuccessResponse<TEndpoint>>

@@ -238,7 +238,7 @@ if (error instanceof HonoResponseError) {
 }
 ```
 
-`error` is typed from the 4xx and 5xx responses the handler returns, so checking `error.status` narrows `error.data` to that response's body. This also applies to `onError` and `useMutation`:
+`error` is typed from the 4xx and 5xx responses the handler returns, so checking `error.status` narrows `error.data` to that response's JSON body. Other bodies stay `unknown`. This also applies to `onError` and `useMutation`:
 
 ```typescript
 // server
