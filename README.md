@@ -106,7 +106,7 @@ function App() {
 
 ### `queryOptions(options?)`
 
-Generates TanStack Query options for GET requests. Returns an object with `queryKey` and `queryFn`. `options` is required only when the endpoint requires input.
+Generates options for `useQuery` and other query hooks. Returns an object with `queryKey` and `queryFn`. `options` is required only when the endpoint requires input.
 
 #### Usage with no input
 
@@ -170,7 +170,7 @@ const options = api.posts.$get.queryOptions({
 
 ### `mutationOptions(options?)`
 
-Generates TanStack Query options for POST, PUT, DELETE requests. Returns an object with `mutationKey` and `mutationFn`. When the endpoint requires no input, `mutate()` can be called without variables.
+Generates options for `useMutation`. Returns an object with `mutationKey` and `mutationFn`. When the endpoint requires no input, `mutate()` can be called without variables.
 
 #### Basic usage
 

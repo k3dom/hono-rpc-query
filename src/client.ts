@@ -74,9 +74,7 @@ type QueryOptionsArgs<TEndpoint extends ClientRequestEndpoint, TData> = Omit<
   'queryKey' | 'queryFn'
 > & {
   abortOnCancel?: boolean
-} & ({} extends InferRequestType<TEndpoint>
-    ? { input?: InferRequestType<TEndpoint> }
-    : { input: InferRequestType<TEndpoint> })
+}
 
 type MutationVariables<TEndpoint extends ClientRequestEndpoint> =
   {} extends InferRequestType<TEndpoint>
@@ -87,8 +85,16 @@ export interface QueryEndpoint<TEndpoint extends ClientRequestEndpoint> {
   call: TEndpoint
   queryOptions: <TData = SuccessResponse<TEndpoint>>(
     ...args: {} extends InferRequestType<TEndpoint>
-      ? [options?: QueryOptionsArgs<TEndpoint, TData>]
-      : [options: QueryOptionsArgs<TEndpoint, TData>]
+      ? [
+          options?: QueryOptionsArgs<TEndpoint, TData> & {
+            input?: InferRequestType<TEndpoint>
+          },
+        ]
+      : [
+          options: QueryOptionsArgs<TEndpoint, TData> & {
+            input: InferRequestType<TEndpoint>
+          },
+        ]
   ) => Omit<
     UseQueryOptions<SuccessResponse<TEndpoint>, EndpointError<TEndpoint>, TData>,
     // Its pageParam context conflicts with fetchQuery's before react-query 5.102.
@@ -178,16 +184,29 @@ export function hcQuery<T extends object>(obj: T) {
           return value
         }
 
-        const nextPath = [...path, prop]
         // hc sends a request for every $-prefixed key except these.
         if (['$url', '$path', '$ws'].includes(prop)) {
           return value
         }
-        if (prop.startsWith('$')) {
-          return createHcQueryEndpoint(value as ClientRequestEndpoint, nextPath)
+
+        const nextPath = [...path, prop]
+        const next = createProxy(value as T, nextPath)
+        if (!prop.startsWith('$')) {
+          return next
         }
 
-        return createProxy(value as T, nextPath)
+        // A $-prefixed key can also be a path segment, such as /odata/$metadata.
+        const endpoint = createHcQueryEndpoint(
+          value as ClientRequestEndpoint,
+          nextPath
+        )
+        return new Proxy(endpoint, {
+          get(endpoint, key) {
+            return key in endpoint || typeof key !== 'string' || key === 'then'
+              ? Reflect.get(endpoint, key)
+              : Reflect.get(next, key)
+          },
+        })
       },
     }) as QueryClient<T>
   }

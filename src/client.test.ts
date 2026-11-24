@@ -138,6 +138,10 @@ const app = new Hono()
   .options('/posts', (c) => c.json({ allow: ['GET', 'POST'] }, 200))
   .on('PURGE', '/cache', (c) => c.json({ purged: true }, 200))
   .get('/greeting', (c) => c.text('hello', 200))
+  .get('/odata/$metadata', (c) => c.json({ version: '4.0' }, 200))
+  .get('/odata/$metadata/:entity', (c) =>
+    c.json({ entity: c.req.param('entity') }, 200)
+  )
 
 const api = hcQuery(hc<typeof app>('http://api.test', { fetch: app.request }))
 
@@ -237,6 +241,19 @@ describe('endpoints', () => {
     await expect(api.cache.$purge.mutationOptions().mutationFn()).resolves.toEqual({
       purged: true,
     })
+  })
+
+  it('keeps $-prefixed path segments navigable', async () => {
+    const context = createQueryContext(new AbortController().signal)
+
+    await expect(
+      api.odata.$metadata.$get.queryOptions().queryFn(context)
+    ).resolves.toEqual({ version: '4.0' })
+    await expect(
+      api.odata.$metadata[':entity'].$get
+        .queryOptions({ input: { param: { entity: 'posts' } } })
+        .queryFn(context)
+    ).resolves.toEqual({ entity: 'posts' })
   })
 
   it('passes $url and $path through to the hono client', () => {
