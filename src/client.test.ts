@@ -16,6 +16,7 @@ function createEndpoint<TResponse>(response: TResponse) {
     return {
       ok: true,
       status: 200,
+      headers: new Headers({ 'content-type': 'application/json' }),
       json: async () => response,
     } as ClientResponse<TResponse>
   })
@@ -26,6 +27,7 @@ function createDeferredEndpoint<TResponse>(response: Promise<TResponse>) {
     return {
       ok: true,
       status: 200,
+      headers: new Headers({ 'content-type': 'application/json' }),
       json: () => response,
     } as ClientResponse<TResponse>
   })
@@ -131,7 +133,15 @@ const app = new Hono()
   .get('/boom', (c) => c.text('Internal Server Error', 500))
   .get('/empty-error', (c) => c.body(null, 503))
   .post('/posts', (c) => c.json({ error: 'invalid' }, 422))
+  .get('/posts/:id', (c) => c.json({ id: Number(c.req.param('id')) }, 200))
   .delete('/posts/:id', (c) => c.body(null, 204))
+  .options('/posts', (c) => c.json({ allow: ['GET', 'POST'] }, 200))
+  .on('PURGE', '/cache', (c) => c.json({ purged: true }, 200))
+  .get('/greeting', (c) => c.text('hello', 200))
+  .get('/odata/$metadata', (c) => c.json({ version: '4.0' }, 200))
+  .get('/odata/$metadata/:entity', (c) =>
+    c.json({ entity: c.req.param('entity') }, 200)
+  )
 
 const api = hcQuery(hc<typeof app>('http://api.test', { fetch: app.request }))
 
@@ -204,12 +214,70 @@ describe('2xx responses', () => {
     ).resolves.toEqual([{ id: 1 }])
   })
 
+  it('resolves the raw text for text responses', async () => {
+    await expect(
+      api.greeting.$get
+        .queryOptions()
+        .queryFn(createQueryContext(new AbortController().signal))
+    ).resolves.toBe('hello')
+  })
+
   it('resolves null for no-content responses', async () => {
     await expect(
       api.posts[':id'].$delete.mutationOptions({}).mutationFn({
         param: { id: '1' },
       })
     ).resolves.toBeNull()
+  })
+})
+
+describe('endpoints', () => {
+  it('wraps methods beyond the common five', async () => {
+    await expect(
+      api.posts.$options
+        .queryOptions()
+        .queryFn(createQueryContext(new AbortController().signal))
+    ).resolves.toEqual({ allow: ['GET', 'POST'] })
+    await expect(api.cache.$purge.mutationOptions().mutationFn()).resolves.toEqual({
+      purged: true,
+    })
+  })
+
+  it('keeps $-prefixed path segments navigable', async () => {
+    const context = createQueryContext(new AbortController().signal)
+
+    await expect(
+      api.odata.$metadata.$get.queryOptions().queryFn(context)
+    ).resolves.toEqual({ version: '4.0' })
+    await expect(
+      api.odata.$metadata[':entity'].$get
+        .queryOptions({ input: { param: { entity: 'posts' } } })
+        .queryFn(context)
+    ).resolves.toEqual({ entity: 'posts' })
+  })
+
+  it('passes $url and $path through to the hono client', () => {
+    const route = api.posts[':id']
+
+    expect(route.$url({ param: { id: '1' } }).href).toBe('http://api.test/posts/1')
+    expect(route.$path({ param: { id: '1' } })).toBe('/posts/1')
+  })
+
+  it('lets a nested query key prefix match every query under that path', async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    })
+    await queryClient.fetchQuery(
+      api.posts[':id'].$get.queryOptions({ input: { param: { id: '1' } } })
+    )
+    await queryClient.fetchQuery(api.posts.$get.queryOptions())
+    await queryClient.fetchQuery(api.greeting.$get.queryOptions())
+
+    expect(
+      queryClient.getQueryCache().findAll({ queryKey: [['posts']] })
+    ).toHaveLength(2)
+
+    queryClient.clear()
   })
 })
 
@@ -303,6 +371,29 @@ describe('types', () => {
     ).getCurrentResult()
 
     expectTypeOf(data).toEqualTypeOf<number | undefined>()
+  })
+
+  it('requires options only when the endpoint requires input', () => {
+    api.posts.$get.queryOptions()
+    api.posts[':id'].$get.queryOptions({ input: { param: { id: '1' } } })
+    // @ts-expect-error the param input is required
+    api.posts[':id'].$get.queryOptions()
+  })
+
+  it('lets mutations without required input run without variables', async () => {
+    const purge = new MutationObserver(
+      queryClient,
+      api.cache.$purge.mutationOptions()
+    )
+    const remove = new MutationObserver(
+      queryClient,
+      api.posts[':id'].$delete.mutationOptions()
+    )
+
+    await expect(purge.mutate()).resolves.toEqual({ purged: true })
+    expectTypeOf<Parameters<typeof remove.mutate>[0]>().toEqualTypeOf<{
+      param: { id: string }
+    }>()
   })
 
   it('tags the query key with the response type', () => {

@@ -81,14 +81,14 @@ function App() {
   const queryClient = useQueryClient()
 
   // Fetch all posts
-  const postsQuery = useQuery(api.posts.$get.queryOptions({}))
+  const postsQuery = useQuery(api.posts.$get.queryOptions())
 
   // Create post mutation and pass options directly to mutationOptions()
   const createPost = useMutation(
     api.posts.$post.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: api.posts.$get.queryOptions({}).queryKey,
+          queryKey: api.posts.$get.queryOptions().queryKey,
         })
       },
     })
@@ -104,17 +104,14 @@ function App() {
 
 ## API Reference
 
-### `queryOptions(config)`
+### `queryOptions(options?)`
 
-Generates TanStack Query options for GET requests. Returns an object with `queryKey` and `queryFn`.
-
-> [!IMPORTANT]
-> You must always pass an object to `queryOptions()`, even when there are no input arguments. Pass an empty object `{}` if no input is needed.
+Generates options for `useQuery` and other query hooks. Returns an object with `queryKey` and `queryFn`. `options` is required only when the endpoint requires input.
 
 #### Usage with no input
 
 ```typescript
-const options = api.posts.$get.queryOptions({})
+const options = api.posts.$get.queryOptions()
 
 useQuery(options)
 ```
@@ -131,12 +128,12 @@ const options = api.posts[':id'].$get.queryOptions({
 useQuery(options)
 ```
 
-#### Usage with json parameters
+#### Usage with query parameters
 
 ```typescript
 const options = api.posts.$get.queryOptions({
   input: {
-    json: { page: 1, limit: 10 },
+    query: { page: '1', limit: '10' },
   },
 })
 
@@ -171,17 +168,14 @@ const options = api.posts.$get.queryOptions({
 
 ---
 
-### `mutationOptions(config)`
+### `mutationOptions(options?)`
 
-Generates TanStack Query options for POST, PUT, DELETE requests. Returns an object with `mutationKey` and `mutationFn`.
-
-> [!IMPORTANT]
-> You must always pass an object to `mutationOptions()`, even when configuring no additional options. Pass an empty object `{}` if no config is needed.
+Generates options for `useMutation`. Returns an object with `mutationKey` and `mutationFn`. When the endpoint requires no input, `mutate()` can be called without variables.
 
 #### Basic usage
 
 ```typescript
-const mutation = useMutation(api.posts.$post.mutationOptions({}))
+const mutation = useMutation(api.posts.$post.mutationOptions())
 
 mutation.mutate({ json: { title: 'New Post', content: 'Content' } })
 ```
@@ -211,7 +205,7 @@ const deleteMutation = useMutation(
     onSuccess: () => {
       // Invalidate queries after deletion
       queryClient.invalidateQueries({
-        queryKey: api.posts.$get.queryOptions({}).queryKey,
+        queryKey: api.posts.$get.queryOptions().queryKey,
       })
     },
   })
@@ -224,12 +218,14 @@ deleteMutation.mutate({ param: { id: '1' } })
 
 ### Error handling
 
-Non-2xx responses reject with `HonoResponseError`, so failures reach `error` instead of `data`. `data` is narrowed to the endpoint's success responses, and 204/205 resolve to `null`.
+Non-2xx responses reject with `HonoResponseError`, so failures reach `error` instead of `data`. `data` is narrowed to the endpoint's success responses. JSON responses resolve to the parsed body, other responses to their text, and 204/205 to `null`.
 
 ```typescript
 import { HonoResponseError } from 'hono-rpc-query'
 
-const { data, error } = useQuery(api.posts[':id'].$get.queryOptions({}))
+const { data, error } = useQuery(
+  api.posts[':id'].$get.queryOptions({ input: { param: { id: '1' } } })
+)
 
 if (error instanceof HonoResponseError) {
   error.status // 404
@@ -276,7 +272,7 @@ You can access the generated query key for cache invalidation or other purposes:
 
 ```typescript
 // Get the query key
-const queryKey = api.posts.$get.queryOptions({}).queryKey
+const queryKey = api.posts.$get.queryOptions().queryKey
 
 // Use it for invalidation
 queryClient.invalidateQueries({ queryKey })
@@ -299,9 +295,10 @@ const queryKey = api.posts[':id'].$get.queryOptions({
 // Invalidate a specific post
 queryClient.invalidateQueries({ queryKey })
 
-// Invalidate all posts (partial matching)
+// Invalidate every query under /posts. Keys start with the path as an array,
+// so match on a prefix of that array.
 queryClient.invalidateQueries({
-  queryKey: ['posts'], // Matches all posts-related queries
+  queryKey: [['posts']],
 })
 ```
 
