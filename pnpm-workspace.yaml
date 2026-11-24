@@ -1,5 +1,3 @@
-# Examples have their own workspace boundaries and lockfiles.
-packages: []
 # Wait 3 days before installing a newly published version.
 minimumReleaseAge: 4320
 catalog:
