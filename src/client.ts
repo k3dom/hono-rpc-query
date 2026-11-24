@@ -1,5 +1,5 @@
 import type {
-  DefaultError,
+  DataTag,
   QueryFunctionContext,
   QueryKey,
   UseMutationOptions,
@@ -11,7 +11,11 @@ import type {
   InferRequestType,
   InferResponseType,
 } from 'hono/client'
-import type { SuccessStatusCode } from 'hono/utils/http-status'
+import type {
+  ClientErrorStatusCode,
+  ServerErrorStatusCode,
+  SuccessStatusCode,
+} from 'hono/utils/http-status'
 import { HonoResponseError } from './error'
 import { buildKey } from './key'
 
@@ -24,6 +28,21 @@ type SuccessResponse<TEndpoint extends ClientRequestEndpoint> = InferResponseTyp
   TEndpoint,
   SuccessStatusCode
 >
+
+type EndpointError<TEndpoint extends ClientRequestEndpoint> =
+  | (Awaited<ReturnType<TEndpoint>> extends infer TResponse
+      ? TResponse extends ClientResponse<infer TBody, infer TStatus, infer TFormat>
+        ? [Extract<TStatus, ClientErrorStatusCode | ServerErrorStatusCode>] extends [
+            never,
+          ]
+          ? never
+          : HonoResponseError<
+              Extract<TStatus, ClientErrorStatusCode | ServerErrorStatusCode>,
+              TFormat extends 'json' | 'text' ? TBody : unknown
+            >
+        : never
+      : never)
+  | Error
 
 async function parseResponse<TData>(res: ClientResponse<unknown>): Promise<TData> {
   if (!res.ok) {
@@ -49,29 +68,37 @@ async function parseResponse<TData>(res: ClientResponse<unknown>): Promise<TData
 
 export interface QueryEndpoint<TEndpoint extends ClientRequestEndpoint> {
   call: TEndpoint
-  queryOptions: (
+  queryOptions: <TData = SuccessResponse<TEndpoint>>(
     args: Omit<
-      UseQueryOptions<SuccessResponse<TEndpoint>>,
+      UseQueryOptions<SuccessResponse<TEndpoint>, EndpointError<TEndpoint>, TData>,
       'queryKey' | 'queryFn'
     > & {
       abortOnCancel?: boolean
     } & ({} extends InferRequestType<TEndpoint>
         ? { input?: undefined }
         : { input: InferRequestType<TEndpoint> })
-  ) => {
-    queryKey: QueryKey
+  ) => UseQueryOptions<
+    SuccessResponse<TEndpoint>,
+    EndpointError<TEndpoint>,
+    TData
+  > & {
+    queryKey: DataTag<QueryKey, SuccessResponse<TEndpoint>, EndpointError<TEndpoint>>
     queryFn: (opts: QueryFunctionContext) => Promise<SuccessResponse<TEndpoint>>
   }
   mutationOptions: (
     args: Omit<
       UseMutationOptions<
         SuccessResponse<TEndpoint>,
-        DefaultError,
+        EndpointError<TEndpoint>,
         InferRequestType<TEndpoint>
       >,
       'mutationKey' | 'mutationFn'
     >
-  ) => {
+  ) => UseMutationOptions<
+    SuccessResponse<TEndpoint>,
+    EndpointError<TEndpoint>,
+    InferRequestType<TEndpoint>
+  > & {
     mutationKey: QueryKey
     mutationFn: (
       input: InferRequestType<TEndpoint>
@@ -92,7 +119,11 @@ function createHcQueryEndpoint<TEndpoint extends ClientRequestEndpoint>(
         queryKey: buildKey(path, {
           type: 'query',
           input: input,
-        }),
+        }) as DataTag<
+          QueryKey,
+          SuccessResponse<TEndpoint>,
+          EndpointError<TEndpoint>
+        >,
         queryFn: async (context) => {
           const res = abortOnCancel
             ? await endpoint(input, { init: { signal: context.signal } })

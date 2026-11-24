@@ -1,4 +1,5 @@
 import {
+  MutationObserver,
   QueryClient,
   QueryObserver,
   type QueryFunctionContext,
@@ -6,7 +7,7 @@ import {
 import { Hono } from 'hono'
 import { hc } from 'hono/client'
 import type { ClientRequestOptions, ClientResponse } from 'hono/client'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, expectTypeOf, it, vi } from 'vite-plus/test'
 import { hcQuery } from './client'
 import { HonoResponseError } from './error'
 
@@ -209,5 +210,97 @@ describe('2xx responses', () => {
         param: { id: '1' },
       })
     ).resolves.toBeNull()
+  })
+})
+
+const typedApp = new Hono()
+  .get('/posts', (c) => c.json([{ id: 1 }], 200))
+  .patch('/permissions', (c) => {
+    if (c.req.header('x-role') === 'guest') {
+      return c.json({ code: 'FORBIDDEN' as const, missing: ['admin'] }, 403)
+    }
+    if (c.req.header('x-member') === undefined) {
+      return c.text('Member not found', 404)
+    }
+    return c.json({ ok: true as const }, 200)
+  })
+
+const typedApi = hcQuery(hc<typeof typedApp>('http://api.test'))
+
+type PermissionsResponseError =
+  | HonoResponseError<403, { code: 'FORBIDDEN'; missing: string[] }>
+  | HonoResponseError<404, 'Member not found'>
+
+type PermissionsError = PermissionsResponseError | Error
+
+describe('types', () => {
+  const queryClient = new QueryClient()
+
+  it('types query errors by the declared error statuses', () => {
+    const { error } = new QueryObserver(
+      queryClient,
+      typedApi.permissions.$patch.queryOptions({})
+    ).getCurrentResult()
+
+    expectTypeOf(error).toEqualTypeOf<PermissionsError | null>()
+  })
+
+  it('types mutation errors in callbacks and results', () => {
+    const { error } = new MutationObserver(
+      queryClient,
+      typedApi.permissions.$patch.mutationOptions({
+        onError: (error) => {
+          expectTypeOf(error).toEqualTypeOf<PermissionsError>()
+        },
+      })
+    ).getCurrentResult()
+
+    expectTypeOf(error).toEqualTypeOf<PermissionsError | null>()
+  })
+
+  it('narrows instanceof to the declared error responses', () => {
+    const error = new Error() as PermissionsError
+
+    if (error instanceof HonoResponseError) {
+      expectTypeOf(error).toEqualTypeOf<PermissionsResponseError>()
+      if (error.status === 403) {
+        expectTypeOf(error.data.missing).toEqualTypeOf<string[]>()
+      }
+    }
+  })
+
+  it('narrows instanceof on an untyped error to an untyped HonoResponseError', () => {
+    const error: unknown = new Error()
+
+    if (error instanceof HonoResponseError) {
+      expectTypeOf(error.status).toEqualTypeOf<number>()
+      expectTypeOf(error.data).toEqualTypeOf<unknown>()
+    }
+  })
+
+  it('keeps plain Error for endpoints without declared error statuses', () => {
+    const { error } = new QueryObserver(
+      queryClient,
+      typedApi.posts.$get.queryOptions({})
+    ).getCurrentResult()
+
+    expectTypeOf(error).toEqualTypeOf<Error | null>()
+  })
+
+  it('types data by the return of select', () => {
+    const { data } = new QueryObserver(
+      queryClient,
+      typedApi.posts.$get.queryOptions({ select: (posts) => posts.length })
+    ).getCurrentResult()
+
+    expectTypeOf(data).toEqualTypeOf<number | undefined>()
+  })
+
+  it('tags the query key with the response type', () => {
+    const { queryKey } = typedApi.posts.$get.queryOptions({})
+
+    expectTypeOf(queryClient.getQueryData(queryKey)).toEqualTypeOf<
+      { id: number }[] | undefined
+    >()
   })
 })
