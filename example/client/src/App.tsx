@@ -9,7 +9,7 @@ function App() {
   const [content, setContent] = useState('')
 
   // Fetch all posts using queryOptions from hono-rpc-query
-  const postsQuery = useQuery(api.posts.$get.queryOptions({}))
+  const postsQuery = useQuery(api.posts.$get.queryOptions())
 
   // Create post mutation using mutationOptions from hono-rpc-query
   const createMutation = useMutation(
@@ -18,7 +18,7 @@ function App() {
         // Invalidate and refetch posts after creating
         // using the queryKey from queryOptions
         await queryClient.invalidateQueries({
-          queryKey: api.posts.$get.queryOptions({}).queryKey,
+          queryKey: api.posts.$get.queryOptions().queryKey,
         })
         setTitle('')
         setContent('')
@@ -31,7 +31,7 @@ function App() {
     api.posts[':id'].$delete.mutationOptions({
       onSuccess: async () => {
         await queryClient.invalidateQueries({
-          queryKey: api.posts.$get.queryOptions({}).queryKey,
+          queryKey: api.posts.$get.queryOptions().queryKey,
         })
       },
     })

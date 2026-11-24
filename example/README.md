@@ -92,14 +92,14 @@ The `api` object provides `queryOptions` and `mutationOptions` for all endpoints
 
 ```typescript
 // Queries - pass options directly to queryOptions
-const postsQuery = useQuery(api.posts.$get.queryOptions({}))
+const postsQuery = useQuery(api.posts.$get.queryOptions())
 
 // Mutations - pass options directly to mutationOptions
 const createMutation = useMutation(
   api.posts.$post.mutationOptions({
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: api.posts.$get.queryOptions({}).queryKey,
+        queryKey: api.posts.$get.queryOptions().queryKey,
       })
     },
   })

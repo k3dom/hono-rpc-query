@@ -63,20 +63,32 @@ async function parseResponse<TData>(res: ClientResponse<unknown>): Promise<TData
     return null as TData
   }
 
-  return (await res.json()) as TData
+  // Same detection as hono/client's parseResponse.
+  const contentType = res.headers.get('content-type')?.split(';')[0] ?? ''
+  const isJson = /^application\/(?:[\w!#$%&*.^`~-]*\+)?json$/i.test(contentType)
+  return (isJson ? await res.json() : await res.text()) as TData
 }
+
+type QueryOptionsArgs<TEndpoint extends ClientRequestEndpoint, TData> = Omit<
+  UseQueryOptions<SuccessResponse<TEndpoint>, EndpointError<TEndpoint>, TData>,
+  'queryKey' | 'queryFn'
+> & {
+  abortOnCancel?: boolean
+} & ({} extends InferRequestType<TEndpoint>
+    ? { input?: InferRequestType<TEndpoint> }
+    : { input: InferRequestType<TEndpoint> })
+
+type MutationVariables<TEndpoint extends ClientRequestEndpoint> =
+  {} extends InferRequestType<TEndpoint>
+    ? InferRequestType<TEndpoint> | void
+    : InferRequestType<TEndpoint>
 
 export interface QueryEndpoint<TEndpoint extends ClientRequestEndpoint> {
   call: TEndpoint
   queryOptions: <TData = SuccessResponse<TEndpoint>>(
-    args: Omit<
-      UseQueryOptions<SuccessResponse<TEndpoint>, EndpointError<TEndpoint>, TData>,
-      'queryKey' | 'queryFn'
-    > & {
-      abortOnCancel?: boolean
-    } & ({} extends InferRequestType<TEndpoint>
-        ? { input?: undefined }
-        : { input: InferRequestType<TEndpoint> })
+    ...args: {} extends InferRequestType<TEndpoint>
+      ? [options?: QueryOptionsArgs<TEndpoint, TData>]
+      : [options: QueryOptionsArgs<TEndpoint, TData>]
   ) => Omit<
     UseQueryOptions<SuccessResponse<TEndpoint>, EndpointError<TEndpoint>, TData>,
     // Its pageParam context conflicts with fetchQuery's before react-query 5.102.
@@ -86,22 +98,22 @@ export interface QueryEndpoint<TEndpoint extends ClientRequestEndpoint> {
     queryFn: (opts: QueryFunctionContext) => Promise<SuccessResponse<TEndpoint>>
   }
   mutationOptions: (
-    args: Omit<
+    options?: Omit<
       UseMutationOptions<
         SuccessResponse<TEndpoint>,
         EndpointError<TEndpoint>,
-        InferRequestType<TEndpoint>
+        MutationVariables<TEndpoint>
       >,
       'mutationKey' | 'mutationFn'
     >
   ) => UseMutationOptions<
     SuccessResponse<TEndpoint>,
     EndpointError<TEndpoint>,
-    InferRequestType<TEndpoint>
+    MutationVariables<TEndpoint>
   > & {
     mutationKey: QueryKey
     mutationFn: (
-      input: InferRequestType<TEndpoint>
+      input: MutationVariables<TEndpoint>
     ) => Promise<SuccessResponse<TEndpoint>>
   }
 }
@@ -112,8 +124,8 @@ function createHcQueryEndpoint<TEndpoint extends ClientRequestEndpoint>(
 ): QueryEndpoint<TEndpoint> {
   return {
     call: endpoint,
-    queryOptions(args) {
-      const { input, abortOnCancel = false, ...rest } = args
+    queryOptions(...[options]) {
+      const { input, abortOnCancel = false, ...rest } = options ?? {}
       return {
         ...rest,
         queryKey: buildKey(path, {
@@ -132,9 +144,9 @@ function createHcQueryEndpoint<TEndpoint extends ClientRequestEndpoint>(
         },
       }
     },
-    mutationOptions(args) {
+    mutationOptions(options) {
       return {
-        ...args,
+        ...options,
         mutationKey: buildKey(path, {
           type: 'mutation',
         }),
@@ -150,22 +162,28 @@ function createHcQueryEndpoint<TEndpoint extends ClientRequestEndpoint>(
 type QueryClient<T> = {
   [K in keyof T]: T[K] extends ClientRequestEndpoint
     ? QueryEndpoint<T[K]>
-    : T[K] extends object
-      ? QueryClient<T[K]>
-      : T[K]
+    : T[K] extends (...args: any) => any
+      ? T[K]
+      : T[K] extends object
+        ? QueryClient<T[K]>
+        : T[K]
 }
 
 export function hcQuery<T extends object>(obj: T) {
   const createProxy = (target: T, path: string[] = []): QueryClient<T> => {
     return new Proxy(target, {
-      get(target, prop, reciever) {
-        const value = Reflect.get(target, prop, reciever)
+      get(target, prop, receiver) {
+        const value = Reflect.get(target, prop, receiver)
         if (typeof prop !== 'string' || prop === 'then') {
           return value
         }
 
         const nextPath = [...path, prop]
-        if (['$get', '$post', '$put', '$patch', '$delete'].includes(prop)) {
+        // hc sends a request for every $-prefixed key except these.
+        if (['$url', '$path', '$ws'].includes(prop)) {
+          return value
+        }
+        if (prop.startsWith('$')) {
           return createHcQueryEndpoint(value as ClientRequestEndpoint, nextPath)
         }
 
