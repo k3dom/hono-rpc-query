@@ -1,15 +1,32 @@
-export class HonoResponseError extends Error {
+export class HonoResponseError<
+  TStatus extends number = number,
+  TData = unknown,
+> extends Error {
   override readonly name = 'HonoResponseError'
 
-  readonly status: number
+  // Without this, instanceof turns the `Error` member of a query's error union
+  // into HonoResponseError<any, any>, which swallows the typed members.
+  static override [Symbol.hasInstance]<
+    TClass extends abstract new (...args: any) => HonoResponseError,
+    TValue,
+  >(
+    this: TClass,
+    value: TValue
+  ): value is [Extract<TValue, InstanceType<TClass>>] extends [never]
+    ? TValue & InstanceType<TClass>
+    : Extract<TValue, InstanceType<TClass>> {
+    return Function.prototype[Symbol.hasInstance].call(this, value)
+  }
+
+  readonly status: TStatus
 
   /** Parsed json, the raw text when the body was not json, undefined when empty. */
-  readonly data: unknown
+  readonly data: TData
 
   /** Body is already consumed to build {@link data}; only metadata is usable. */
   readonly response: Response
 
-  constructor(response: Response, data: unknown) {
+  constructor(response: Response & { status: TStatus }, data: TData) {
     // Omit the url so error trackers group by status.
     super(`Request failed with status ${response.status}`)
     this.status = response.status

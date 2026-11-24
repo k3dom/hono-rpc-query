@@ -18,7 +18,7 @@ app.use(cors(), logger())
 
 const routes = app
   .get('/posts', (c) => {
-    return c.json(posts)
+    return c.json(posts, 200)
   })
   .get(
     '/posts/:id',
@@ -34,7 +34,7 @@ const routes = app
       if (!post) {
         return c.notFound()
       }
-      return c.json(post)
+      return c.json(post, 200)
     }
   )
   .post(
@@ -76,7 +76,7 @@ const routes = app
         return c.notFound()
       }
       posts[index] = { id, title, content }
-      return c.json(posts[index])
+      return c.json(posts[index], 200)
     }
   )
   .patch(
@@ -103,7 +103,7 @@ const routes = app
       }
       if (updates.title) post.title = updates.title
       if (updates.content) post.content = updates.content
-      return c.json(post)
+      return c.json(post, 200)
     }
   )
   .delete(
@@ -121,7 +121,7 @@ const routes = app
         return c.notFound()
       }
       const deleted = posts.splice(index, 1)[0]
-      return c.json(deleted)
+      return c.json(deleted, 200)
     }
   )
 

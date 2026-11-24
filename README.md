@@ -29,10 +29,13 @@ import { z } from 'zod'
 const app = new Hono()
 const routes = app
   .get('/posts', (c) => {
-    return c.json([
-      { id: 1, title: 'Hello World' },
-      { id: 2, title: 'Learning Hono' },
-    ])
+    return c.json(
+      [
+        { id: 1, title: 'Hello World' },
+        { id: 2, title: 'Learning Hono' },
+      ],
+      200
+    )
   })
   .get(
     '/posts/:id',
@@ -40,7 +43,7 @@ const routes = app
     (c) => {
       const { id } = c.req.valid('param')
       // ... fetch post logic
-      return c.json({ id, title: 'Post title' })
+      return c.json({ id, title: 'Post title' }, 200)
     }
   )
   .post(
@@ -49,7 +52,7 @@ const routes = app
     (c) => {
       const data = c.req.valid('json')
       // ... create post logic
-      return c.json({ id: 3, ...data })
+      return c.json({ id: 3, ...data }, 201)
     }
   )
 
@@ -234,6 +237,29 @@ if (error instanceof HonoResponseError) {
   error.response // metadata only, the body is already read
 }
 ```
+
+`error` is typed from the 4xx and 5xx responses the handler returns, so checking `error.status` narrows `error.data` to that response's JSON body. Other bodies stay `unknown`. This also applies to `onError` and `useMutation`:
+
+```typescript
+// server
+.patch('/members/:id/permissions', (c) => {
+  if (!allowed) return c.json({ code: 'FORBIDDEN', missing: ['admin'] }, 403)
+  return c.json({ ok: true }, 200)
+})
+
+// client
+api.members[':id'].permissions.$patch.mutationOptions({
+  onError: (error) => {
+    if (error instanceof HonoResponseError && error.status === 403) {
+      error.data.missing // string[]
+    }
+  },
+})
+```
+
+Pass the status explicitly in every `c.json()` of a route. Hono types `c.json(body)` without a status as possible for any status code, so that body would also show up as an error body. `c.notFound()` is untyped unless you [type `NotFoundResponse`](https://hono.dev/docs/guides/rpc#not-found), and leaves `error.data` as `unknown` for the whole route.
+
+The error types only cover what the route's handlers return. Middleware, `HTTPException`, `app.onError` and proxies can still respond with other statuses and bodies, and network failures reject with a plain `Error`.
 
 TanStack Query's default `retry: 3` now applies to 4xx. To skip those, set a predicate on your `QueryClient`:
 
