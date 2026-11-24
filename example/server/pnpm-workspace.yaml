@@ -1,4 +1,6 @@
 # Keep this example independent of the library's workspace and lockfile.
 packages: []
+# Wait 3 days before installing a newly published version.
+minimumReleaseAge: 4320
 allowBuilds:
   esbuild: true

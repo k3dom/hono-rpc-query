@@ -29,10 +29,10 @@
     "release": "changeset publish"
   },
   "devDependencies": {
-    "@changesets/cli": "3.0.2",
-    "@tanstack/react-query": "5.102.8",
+    "@changesets/cli": "3.0.3",
+    "@tanstack/react-query": "5.108.2",
     "@vitest/coverage-v8": "catalog:",
-    "hono": "4.13.7",
+    "hono": "4.13.19",
     "typescript": "7.0.2",
     "vite": "catalog:",
     "vite-plus": "catalog:",
@@ -42,5 +42,5 @@
     "@tanstack/react-query": "^5.75.5",
     "hono": "^4.7.8"
   },
-  "packageManager": "pnpm@12.3.4"
+  "packageManager": "pnpm@12.22.0"
 }

@@ -78,8 +78,8 @@ export type AppRoutes = typeof routes
 The client creates a Hono RPC client and wraps it with `hcQuery`:
 
 ```typescript
-import { hc } from 'hono/client'
 import { hcQuery } from 'hono-rpc-query'
+import { hc } from 'hono/client'
 import type { AppRoutes } from '../../server/src/index'
 
 const client = hc<AppRoutes>('http://localhost:3001')

@@ -22,8 +22,9 @@ yarn add hono-rpc-query
 
 ```typescript
 // server/index.ts
-import { Hono } from 'hono'
+
 import { zValidator } from '@hono/zod-validator'
+import { Hono } from 'hono'
 import { z } from 'zod'
 
 const app = new Hono()
@@ -63,8 +64,9 @@ export type AppRoutes = typeof routes
 
 ```typescript
 // client/api.ts
-import { hc } from 'hono/client'
+
 import { hcQuery } from 'hono-rpc-query'
+import { hc } from 'hono/client'
 import type { AppRoutes } from '../server'
 
 const client = hc<AppRoutes>('http://localhost:3001')
